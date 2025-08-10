@@ -1,18 +1,13 @@
-const jwt = require('jsonwebtoken');
+import sign from "jsonwebtoken";
 
 const generateToken = (data, secret, expiresIn) => {
-    return jwt.sign(data, secret, { expiresIn });
+  return sign(data, secret, { expiresIn });
 };
 
-const generateAccessToken = (tokenData) => {
-    return generateToken(tokenData, process.env.JWT_SECRET, '1d');
+export const generateAccessToken = (tokenData) => {
+  return generateToken(tokenData, process.env.JWT_SECRET, "1d");
 };
 
-const generateRefreshToken = (tokenData) => {
-    return generateToken(tokenData, process.env.REFRESH_TOKEN_SECRET, '30d');
-};
-
-module.exports = {
-    generateAccessToken,
-    generateRefreshToken
+export const generateRefreshToken = (tokenData) => {
+  return generateToken(tokenData, process.env.REFRESH_TOKEN_SECRET, "30d");
 };

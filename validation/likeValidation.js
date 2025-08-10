@@ -1,29 +1,32 @@
-const joi = require('joi');
+import Joi from "joi";
+const { object, string } = Joi;
+export function likeValidation(req, res, next) {
+  // console.log("likeValidation.js")
+  const schema = object({
+    userId: string().required(),
+    media: string().required(),
+  });
+  const { error } = schema.validate(req.body);
 
-exports.likeValidation = (req, res, next) => {
-    // console.log("likeValidation")
-    const schema = joi.object({
-        userId: joi.string().required(),
-        media: joi.string().required()
-    });
-    const { error } = schema.validate(req.body);
+  if (error)
+    return res
+      .status(400)
+      .json({ status: 400, message: error.details.map((d) => d.message) });
 
-    if (error) return res.status(400).json({ status: 400, message: error.details.map(d => d.message) });
-
-    next();
+  next();
 }
 
+export function unlikeValidation(req, res, next) {
+  const schema = object({
+    userId: string().required(),
+    media: string().required(),
+  });
+  const { error } = schema.validate(req.body);
 
-exports.unlikeValidation = (req, res, next) => {
-    const schema = joi.object({
-        userId: joi.string().required(),
-        media: joi.string().required()
-    });
-    const { error } = schema.validate(req.body);
+  if (error)
+    return res
+      .status(400)
+      .json({ status: 400, message: error.details.map((d) => d.message) });
 
-    if (error) return res.status(400).json({ status: 400, message: error.details.map(d => d.message) });
-
-    next();
+  next();
 }
-
-

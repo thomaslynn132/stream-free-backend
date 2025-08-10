@@ -1,19 +1,17 @@
-const joi = require('joi');
+import Joi from "joi";
+const { object, string, number } = Joi;
+export function createReviewValidation(req, res, next) {
+  const schema = object({
+    fullName: string().required(),
+    email: string().required(),
+    text: string().required(),
+    rating: number().required(),
+    media: string().required(),
+  });
+  const { error } = schema.validate(req.body);
+  if (error) return res.status(400).json({ message: error.details[0].message });
 
-
-exports.createReviewValidation = (req, res, next) => {
-    const schema = joi.object({
-        fullName: joi.string().required(),
-        email: joi.string().required(),
-        text: joi.string().required(),
-        rating: joi.number().required(),
-        media: joi.string().required()
-    })
-    const { error } = schema.validate(req.body);
-    if (error) return res.status(400).json({ message: error.details[0].message });
-
-    next();
-};
-
+  next();
+}
 
 //! add more validation functions here

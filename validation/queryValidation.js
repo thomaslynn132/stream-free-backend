@@ -1,5 +1,5 @@
-const { isValidObjectId } = require("mongoose");
+import { isValidObjectId } from "mongoose";
 
-exports.queryValidation = (id, res, text) => {
-    if (!isValidObjectId(id)) return res.status(400).json({ message: text });
+export function queryValidation(id, res, text) {
+  if (!isValidObjectId(id)) return res.status(400).json({ message: text });
 }

@@ -1,24 +1,26 @@
-const mongoose = require('mongoose');
+import { Schema, model } from "mongoose";
 
-const seasonModel = mongoose.Schema({
-    series: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: [true, 'Series is required'],
-        ref: 'Series'
+const seasonModel = Schema({
+  series: {
+    type: Schema.Types.ObjectId,
+    required: [true, "Series is required"],
+    ref: "Series",
+  },
+  //! must change to default and check season data base for seasonNumber ...
+  seasonNumber: {
+    type: Number,
+    required: [true, "Season number is required"],
+  },
+  episodes: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Episodes",
+      // type: String
     },
-    //! must change to default and check season data base for seasonNumber ...
-    seasonNumber: {
-        type: Number,
-        required: [true, 'Season number is required'],
-    },
-    episodes: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Episodes'
-        // type: String
-    }]
+  ],
 });
 
-module.exports = mongoose.model('Seasons', seasonModel);
+export default model("Seasons", seasonModel);
 
 // Season
 //     .findOne({ seasonNumber: 1 })

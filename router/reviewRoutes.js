@@ -1,20 +1,26 @@
-const express = require('express');
-const { getAllReviews, createReview, getReview, updateReview, deleteReview, getMovieReview } = require('../controller/reviewController');
-const ValidateObjectId = require('../middleware/ValidateObjectId');
-const { createReviewValidation } = require('../validation/reviewValidation');
+import { Router } from "express";
+import {
+  getAllReviews,
+  createReview,
+  getReview,
+  updateReview,
+  deleteReview,
+  getMovieReview,
+} from "../controller/reviewController.js";
+import ValidateObjectId from "../middleware/ValidateObjectId.js";
+import { createReviewValidation } from "../validation/reviewValidation.js";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/allReview", getAllReviews);
 
-router.route("/")
-    .post(createReviewValidation, createReview);
+router.route("/").post(createReviewValidation, createReview);
 
 router
-    .route('/:id')
-    .get(ValidateObjectId, getMovieReview)
-    .get(ValidateObjectId, getReview)
-    .put(ValidateObjectId, updateReview)
-    .delete(ValidateObjectId, deleteReview);
+  .route("/:id")
+  .get(ValidateObjectId, getMovieReview)
+  .get(ValidateObjectId, getReview)
+  .put(ValidateObjectId, updateReview)
+  .delete(ValidateObjectId, deleteReview);
 
-module.exports = router;
+export default router;

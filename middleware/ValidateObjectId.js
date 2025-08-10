@@ -1,8 +1,8 @@
-const { isValidObjectId } = require("mongoose");
+import { isValidObjectId } from "mongoose";
 
-module.exports = function (req, res, next) {
-    if (!isValidObjectId(req.params.id)) {
-        return res.status(400).json({ status: 400, message: "Invalid ID" });
-    }
-    next();
-};
+export default function (req, res, next) {
+  if (!isValidObjectId(req.params.id)) {
+    return res.status(400).json({ status: 400, message: "Invalid ID" });
+  }
+  next();
+}

@@ -1,34 +1,32 @@
-const joi = require('joi');
+import Joi from "joi";
+const { object, string } = Joi;
+export function createSupportTicketValidation(req, res, next) {
+  const schema = object({
+    fullName: string().required(),
+    email: string().email().required(),
+    subject: string().required(),
+    message: string().required(),
+  });
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
 
+  next();
+}
 
-exports.createSupportTicketValidation = (req, res, next) => {
-    const schema = joi.object({
-        fullName: joi.string().required(),
-        email: joi.string().email().required(),
-        subject: joi.string().required(),
-        message: joi.string().required(),
-    });
-    const { error } = schema.validate(req.body);
-    if (error) {
-        return res.status(400).json({ error: error.details[0].message });
-    }
+export function updateSupportTicketValidation(req, res, next) {
+  const schema = object({
+    fullName: string().required(),
+    email: string().email(),
+    status: string().valid("pending", "in progress", "resolved"),
+    subject: string().required(),
+    message: string(),
+  });
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
 
-    next();
-};
-
-
-exports.updateSupportTicketValidation = (req, res, next) => {
-    const schema = joi.object({
-        fullName: joi.string().required(),
-        email: joi.string().email(),
-        status: joi.string().valid('pending', 'in progress', 'resolved'),
-        subject: joi.string().required(),
-        message: joi.string(),
-    });
-    const { error } = schema.validate(req.body);
-    if (error) {
-        return res.status(400).json({ error: error.details[0].message });
-    }
-
-    next();
+  next();
 }

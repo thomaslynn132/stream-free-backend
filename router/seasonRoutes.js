@@ -1,19 +1,19 @@
-const express = require('express');
-const { createSeason, getSeason, updateSeason, deleteSeason, getSeasonsBySeries } = require('../controller/seasonController');
-const ValidateObjectId = require('../middleware/ValidateObjectId');
-const { createSeasonValidation } = require('../validation/seasonValidation');
+import { Router } from "express"; // seasonRoutes.js
+import * as seasonController from "../controller/seasonController.js";
 
-const router = express.Router();
+import ValidateObjectId from "../middleware/ValidateObjectId.js";
+import { createSeasonValidation } from "../validation/seasonValidation.js";
 
-router.route('/')
-    .post(createSeasonValidation, createSeason);
+const router = Router();
 
-router.route('/seasons/:seriesId')
-    .get(getSeasonsBySeries);
+router.route("/").post(createSeasonValidation, seasonController.createSeason);
 
-router.route('/:id')
-    .get(ValidateObjectId, getSeason)
-    .put(ValidateObjectId, updateSeason)
-    .delete(ValidateObjectId, deleteSeason);
+router.route("/seasons/:seriesId").get(seasonController.getSeasonsBySeries);
 
-module.exports = router;
+router
+  .route("/:id")
+  .get(ValidateObjectId, seasonController.getSeason)
+  .put(ValidateObjectId, seasonController.updateSeason)
+  .delete(ValidateObjectId, seasonController.deleteSeason);
+
+export default router;

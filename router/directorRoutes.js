@@ -1,21 +1,31 @@
-const express = require('express');
-const { getAllDirectors, getDirector, updateDirector, deleteDirector, createDirector, getDirectorMovies, getDirectorSeries } = require('../controller/directorController');
-const ValidateObjectId = require('../middleware/ValidateObjectId');
-const Authorize = require('../middleware/Authorize');
-const Authenticate = require('../middleware/Authenticate');
+import { Router } from "express";
+import {
+  getAllDirectors,
+  getDirector,
+  updateDirector,
+  deleteDirector,
+  createDirector,
+  getDirectorMovies,
+  getDirectorSeries,
+} from "../controller/directorController.js";
+import ValidateObjectId from "../middleware/ValidateObjectId.js";
+import Authorize from "../middleware/Authorize.js";
+import Authenticate from "../middleware/Authenticate.js";
 
-const router = express.Router();
-
+const router = Router();
 
 router.get("/directorList", getAllDirectors);
 router.post("/", [Authenticate, Authorize(["admin"])], createDirector);
 router.get("/seriesList/:id", ValidateObjectId, getDirectorSeries);
-router.get("/moviesList/:id", ValidateObjectId,getDirectorMovies);
+router.get("/moviesList/:id", ValidateObjectId, getDirectorMovies);
 
 router
-    .route('/:id')
-    .get(ValidateObjectId, getDirector)
-    .put([ValidateObjectId, Authenticate, Authorize(["admin"])], updateDirector)
-    .delete([ValidateObjectId, Authenticate, Authorize(["admin"])], deleteDirector);
+  .route("/:id")
+  .get(ValidateObjectId, getDirector)
+  .put([ValidateObjectId, Authenticate, Authorize(["admin"])], updateDirector)
+  .delete(
+    [ValidateObjectId, Authenticate, Authorize(["admin"])],
+    deleteDirector
+  );
 
-module.exports = router;
+export default router;

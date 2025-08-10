@@ -106,121 +106,121 @@
 // module.exports = searchController;
 // 63 80
 
-
-
 // 30 45
-const Actor = require('../model/actorModel');
-const Director = require('../model/directorModel');
-const Review = require('../model/reviewModel');
+import Actors from "../model/actorModel.js";
+import Directors from "../model/directorModel.js";
+import Reviews from "../model/reviewModel.js";
 
 const searchController = async (req, res) => {
-    const { query } = req.body;
-    const limit = parseInt(req.query.limit) || 6;
+  const { query } = req.body;
+  const limit = parseInt(req.query.limit) || 6;
 
-    if (!query) {
-        return res.status(400).json({ status: 400, message: "Query is required" });
-    }
+  if (!query) {
+    return res.status(400).json({ status: 400, message: "Query is required" });
+  }
 
-    try {
-        const [movieResults, seriesResults, actorResults, directorResults] = await Promise.all([
-            Review.aggregate([
-                {
-                    $lookup: {
-                        from: 'movies',
-                        localField: 'media',
-                        foreignField: '_id',
-                        as: 'movieDetails'
-                    }
-                },
-                { $unwind: '$movieDetails' },
-                { $match: { 'movieDetails.title': { $regex: query, $options: 'i' } } },
-                {
-                    $group: {
-                        _id: '$media',
-                        rate: { $avg: '$rating' },
-                        movieDetails: { $first: '$movieDetails' }
-                    }
-                },
-                {
-                    $project: {
-                        _id: 0,
-                        type: 'movie',
-                        data: {
-                            _id: '$_id',
-                            title: '$movieDetails.title',
-                            description: '$movieDetails.description',
-                            thumbnail: '$movieDetails.thumbnail',
-                            genres: '$movieDetails.genres',
-                            rate: '$rate'
-                        }
-                    }
-                },
-                { $limit: limit }
-            ]),
-            Review.aggregate([
-                {
-                    $lookup: {
-                        from: 'series',
-                        localField: 'media',
-                        foreignField: '_id',
-                        as: 'seriesDetails'
-                    }
-                },
-                { $unwind: '$seriesDetails' },
-                { $match: { 'seriesDetails.title': { $regex: query, $options: 'i' } } },
-                {
-                    $group: {
-                        _id: '$media',
-                        rate: { $avg: '$rating' },
-                        seriesDetails: { $first: '$seriesDetails' }
-                    }
-                },
-                {
-                    $project: {
-                        _id: 0,
-                        type: 'series',
-                        data: {
-                            _id: '$_id',
-                            title: '$seriesDetails.title',
-                            description: '$seriesDetails.description',
-                            thumbnail: '$seriesDetails.thumbnail',
-                            genres: '$seriesDetails.genres',
-                            rate: '$rate'
-                        }
-                    }
-                },
-                { $limit: limit }
-            ]),
-            Actor.find({ fullName: { $regex: query, $options: 'i' } })
-                .select("fullName profile birthDate country birthPlace bio")
-                .limit(limit),
-            Director.find({ fullName: { $regex: query, $options: 'i' } })
-                .select("fullName profile birthDate country birthPlace bio")
-                .limit(limit)
-        ]);
+  try {
+    const [movieResults, seriesResults, actorResults, directorResults] =
+      await Promise.all([
+        Reviews.aggregate([
+          {
+            $lookup: {
+              from: "movies",
+              localField: "media",
+              foreignField: "_id",
+              as: "movieDetails",
+            },
+          },
+          { $unwind: "$movieDetails" },
+          {
+            $match: { "movieDetails.title": { $regex: query, $options: "i" } },
+          },
+          {
+            $group: {
+              _id: "$media",
+              rate: { $avg: "$rating" },
+              movieDetails: { $first: "$movieDetails" },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              type: "movie",
+              data: {
+                _id: "$_id",
+                title: "$movieDetails.title",
+                description: "$movieDetails.description",
+                thumbnail: "$movieDetails.thumbnail",
+                genres: "$movieDetails.genres",
+                rate: "$rate",
+              },
+            },
+          },
+          { $limit: limit },
+        ]),
+        aggregate([
+          {
+            $lookup: {
+              from: "series",
+              localField: "media",
+              foreignField: "_id",
+              as: "seriesDetails",
+            },
+          },
+          { $unwind: "$seriesDetails" },
+          {
+            $match: { "seriesDetails.title": { $regex: query, $options: "i" } },
+          },
+          {
+            $group: {
+              _id: "$media",
+              rate: { $avg: "$rating" },
+              seriesDetails: { $first: "$seriesDetails" },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              type: "series",
+              data: {
+                _id: "$_id",
+                title: "$seriesDetails.title",
+                description: "$seriesDetails.description",
+                thumbnail: "$seriesDetails.thumbnail",
+                genres: "$seriesDetails.genres",
+                rate: "$rate",
+              },
+            },
+          },
+          { $limit: limit },
+        ]),
+        Actors.find({ fullName: { $regex: query, $options: "i" } })
+          .select("fullName profile birthDate country birthPlace bio")
+          .limit(limit),
+        Directors._find({ fullName: { $regex: query, $options: "i" } })
+          .select("fullName profile birthDate country birthPlace bio")
+          .limit(limit),
+      ]);
 
-        const combinedResults = [
-            ...movieResults,
-            ...seriesResults,
-            ...actorResults.map(result => ({ type: 'actor', data: result })),
-            ...directorResults.map(result => ({ type: 'director', data: result }))
-        ];
+    const combinedResults = [
+      ...movieResults,
+      ...seriesResults,
+      ...actorResults.map((result) => ({ type: "actor", data: result })),
+      ...directorResults.map((result) => ({ type: "director", data: result })),
+    ];
 
-        res.status(200).json({
-            status: 200,
-            message: "Search results fetched successfully",
-            results: combinedResults.slice(0, limit)
-        });
-    } catch (error) {
-        console.error("Error fetching search results:", error);
-        res.status(500).send({ status: 500, message: "Internal Server Error" });
-    }
+    res.status(200).json({
+      status: 200,
+      message: "Search results fetched successfully",
+      results: combinedResults.slice(0, limit),
+    });
+  } catch (error) {
+    console.error("Error fetching search results:", error);
+    res.status(500).send({ status: 500, message: "Internal Server Error" });
+  }
 };
 
-module.exports = searchController;
-
-
-
+export default searchController;
 
 // const Movie = require('../model/movieModel');
 // const Series = require('../model/seriesModel');

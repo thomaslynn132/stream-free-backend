@@ -1,59 +1,68 @@
-const multer = require('multer');
-const shortid = require("shortid");
-const path = require("path"); // Ensure path is required for filename extension extraction
+import multer, { diskStorage } from "multer";
+import { generate } from "shortid";
+import { extname } from "path"; // Ensure path is required for filename extension extraction
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        let dir;
-        switch (file.fieldname) {
-            case 'thumbnail':
-            case 'pictures':
-                dir = 'public/thumbnail';
-                break;
-            case 'cover':
-                dir = 'public/cover';
-                break;
-            case 'trailer':
-                dir = 'public/trailer';
-                break;
-            case 'files':
-                dir = 'public/videos';
-                break;
-            default:
-                dir = 'public/';
-        }
-        cb(null, dir);
-    },
-    filename: async (req, file, cb) => {
-        const ext = path.extname(file.originalname);
+const storage = diskStorage({
+  destination: (req, file, cb) => {
+    let dir;
+    switch (file.fieldname) {
+      case "thumbnail":
+      case "pictures":
+        dir = "public/thumbnail";
+        break;
+      case "cover":
+        dir = "public/cover";
+        break;
+      case "trailer":
+        dir = "public/trailer";
+        break;
+      case "files":
+        dir = "public/videos";
+        break;
+      default:
+        dir = "public/";
+    }
+    cb(null, dir);
+  },
+  filename: async (req, file, cb) => {
+    const ext = extname(file.originalname);
 
-        if (req.body.episodeNumber) {
-            const { seasonNumber, episodeNumber, seriesTitle } = req.body;
-            const title = seriesTitle.replace(/\s+/g, '-');
-            cb(null, `${title}-Season${seasonNumber}Episode${episodeNumber}-${shortid.generate()}-streamvibe${ext}`);
-        }
-        else {
-            const title = req.body.title.replace(/\s+/g, '-');
-            cb(null, `${title}-${req.body.release_date}-${shortid.generate()}-streamvibe${ext}`);
-        }
-    },
+    if (req.body.episodeNumber) {
+      const { seasonNumber, episodeNumber, seriesTitle } = req.body;
+      const title = seriesTitle.replace(/\s+/g, "-");
+      cb(
+        null,
+        `${title}-Season${seasonNumber}Episode${episodeNumber}-${generate()}-streamvibe${ext}`,
+      );
+    } else {
+      const title = req.body.title.replace(/\s+/g, "-");
+      cb(
+        null,
+        `${title}-${req.body.release_date}-${generate()}-streamvibe${ext}`,
+      );
+    }
+  },
 });
 
 const upload = multer({ storage });
 
+export const movieUploader = upload.fields([
+  { name: "thumbnail", maxCount: 1 },
+  { name: "cover", maxCount: 1 },
+  { name: "trailer", maxCount: 1 },
+  { name: "files" },
+]);
 
-//! movie controller
-exports.movieUploader = upload.fields([{ name: 'thumbnail', maxCount: 1 }, { name: "cover", maxCount: 1 }, { name: 'trailer', maxCount: 1 }, { name: 'files' }]);
+export const seriesUploader = upload.fields([
+  { name: "thumbnail", maxCount: 1 },
+  { name: "cover", maxCount: 1 },
+  { name: "trailer", maxCount: 1 },
+]);
 
-//! series controller
-exports.seriesUploader = upload.fields([{ name: 'thumbnail', maxCount: 1 }, { name: "cover", maxCount: 1 }, { name: 'trailer', maxCount: 1 }]);
-
-//! episode controller
-exports.episodeUploader = upload.fields([{ name: 'files' }, { name: 'pictures', maxCount: 2 }]);
-
-
-
-
+export const episodeUploader = upload.fields([
+  { name: "files" },
+  { name: "pictures", maxCount: 2 },
+]);
 
 // const fs = require('fs').promises;
 // const path = require('path');
@@ -148,11 +157,6 @@ exports.episodeUploader = upload.fields([{ name: 'files' }, { name: 'pictures', 
 // //! episode controller
 // exports.episodeUploader = [upload.fields([{ name: 'files' }, { name: 'pictures', maxCount: 2 }]), processImages];
 
-
-
-
-
-
 // const multer = require('multer');
 // const sharp = require('sharp');
 // const shortid = require("shortid");
@@ -236,7 +240,6 @@ exports.episodeUploader = upload.fields([{ name: 'files' }, { name: 'pictures', 
 
 // //! episode controller
 // exports.episodeUploader = [upload.fields([{ name: 'files' }, { name: 'pictures', maxCount: 2 }]), imageProcessingMiddleware];
-
 
 // const multer = require('multer');
 // const sharp = require('sharp');
@@ -327,9 +330,6 @@ exports.episodeUploader = upload.fields([{ name: 'files' }, { name: 'pictures', 
 // exports.movieUploader = [upload.fields([{ name: 'thumbnail', maxCount: 1 }, { name: "cover", maxCount: 1 }, { name: 'trailer', maxCount: 1 }, { name: 'files' }]), imageProcessingMiddleware];
 // exports.seriesUploader = [upload.fields([{ name: 'thumbnail', maxCount: 1 }, { name: "cover", maxCount: 1 }, { name: 'trailer', maxCount: 1 }]), imageProcessingMiddleware];
 // exports.episodeUploader = [upload.fields([{ name: 'files' }, { name: 'pictures', maxCount: 2 }]), imageProcessingMiddleware];
-
-
-
 
 //! V3
 // const multer = require('multer');

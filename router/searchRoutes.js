@@ -1,11 +1,9 @@
-const express = require('express');
-const searchController = require('../controller/searchController');
-const { searchValidation } = require('../validation/searchValidation');
+import { Router } from "express";
+import searchController from "../controller/searchController.js";
+import { searchValidation } from "../validation/searchValidation.js";
 
-const router = express.Router();
+const router = Router();
 
+router.post("/", searchValidation, searchController);
 
-router.post("/", searchValidation, searchController)
-
-
-module.exports = router;
+export default router;

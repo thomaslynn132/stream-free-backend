@@ -1,15 +1,29 @@
-const joi = require('joi');
+import Joi from "joi";
+const { object, string } = Joi;
+export function createSeasonValidation(req, res, next) {
+  const schema = object({
+    series: string().required(),
+    episodes: array().items(string()),
+  });
+  const { error } = schema.validate(req.body);
+  if (error)
+    return res
+      .status(400)
+      .json({ status: 400, message: error.details.map((d) => d.message) });
 
-
-exports.createSeasonValidation = (req, res, next) => {
-    const schema = joi.object({
-        series: joi.string().required(),
-        episodes: joi.array().items(joi.string())
-    });
-    const { error } = schema.validate(req.body);
-    if (error) return res.status(400).json({ status: 400, message: error.details.map(d => d.message) });
-
-    next();
+  next();
 }
 
-//! must add validation for editSeasonValidation
+export function editSeasonValidation(req, res, next) {
+  const schema = object({
+    series: string(),
+    episodes: array().items(string()),
+  });
+  const { error } = schema.validate(req.body);
+  if (error)
+    return res
+      .status(400)
+      .json({ status: 400, message: error.details.map((d) => d.message) });
+
+  next();
+}
